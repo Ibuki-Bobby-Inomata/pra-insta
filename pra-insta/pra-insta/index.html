@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>insta-pra</title>
+</head>
+<body>
+<div class="insta_list">
+    <?php
+        $insta_media_limit = '100';
+        $insta_business_id = '175763397702983';
+        $insta_access_token = 'EAACf2xridUcBAISZAyQMPW1TaEp0zA2gNydRBdQUJOEYKwbZCdljOK4WZBUa4z8e6D8vfxUsLV9FYNS8px5IqRbCK8ZBqhqLmN8qIjchgPFd9kbx6cMn70bDGKZCscBilIHjPYjGEwFhz71E6MPfcykNR8MMuD8is4GaLPnTD7QZDZD';
+
+        $json = file_get_contents("https://graph.facebook.com/v6.0/{$insta_business_id}?fields=name%2Cmedia.limit({$insta_media_limit})%7Bcaption%2Cmedia_url%2Cthumbnail_url%2Cpermalink%7D&access_token={$insta_access_token}");
+
+        $json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
+        $obj = json_decode($json, true);
+
+        $insta = [];
+
+        foreach ($obj['media']['data'] as $k => $v) {
+    if ($v['thumbnail_url']) {
+    $data = [
+    'img' => $v['thumbnail_url'],
+    'caption' => $v['caption'],
+    'link' => $v['permalink'],
+    ];
+    } else {
+    $data = [
+    'img' => $v['media_url'],
+    'caption' => $v['caption'],
+    'link' => $v['permalink'],
+    ];
+    }
+    $insta[] = $data;
+    }
+    foreach ($insta as $k => $v){
+    echo '<a href="'.$v['link'].'"><img src="'.$v['img'].'"></a>';
+    }
+    ?>
+</div>
+<script>
+    $(function () {
+        $.ajax({
+            type: 'GET',
+            url: 'https://graph.facebook.com/v8.0/17841593698074073/top_media?user_id=17841445900855282&fields=media_url,media_type,comments_count,id,like_count,children%7Bmedia_url,permalink%7D,permalink,caption&access_token=EAACf2xridUcBAISZAyQMPW1TaEp0zA2gNydRBdQUJOEYKwbZCdljOK4WZBUa4z8e6D8vfxUsLV9FYNS8px5IqRbCK8ZBqhqLmN8qIjchgPFd9kbx6cMn70bDGKZCscBilIHjPYjGEwFhz71E6MPfcykNR8MMuD8is4GaLPnTD7QZDZD',
+            dataType: 'json',
+            success: function (json) {
+
+                var html = '';
+                var insta = json.media.data;
+                for (var i = 0; i < insta.length; i++) {
+                    var media_type = insta[i].media_type;
+                    if (insta[i].media_type == "IMAGE" || insta[i].media_type == "CAROUSEL_ALBUM") {
+                        html += '<li><a href="' + insta[i].permalink + '" target="_blank" rel="noopener noreferrer"><span class="square-content"><img src="' + insta[i].media_url + '"></span></a></li>';
+                    } else if (media_type == "VIDEO") {
+                        html += '<li><a href="' + insta[i].permalink + '" target="_blank" rel="noopener noreferrer"><span class="square-content"><img src="' + insta[i].thumbnail_url + '"></span></a></li>';
+                        var media_type = '';
+                    }
+                }
+                $(".insta_list").append(html);
+            },
+            error: function () {
+
+                //エラー時の処理
+            }
+        });
+    });
+</script>
+<div class="insta_list"></div>
+</body>
+</html>

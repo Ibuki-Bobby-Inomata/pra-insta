@@ -1,0 +1,12 @@
+.insta_list{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+    margin: 3vw 0 2vw;
+}
+
+.insta_list img{
+    width: 13vw;
+    padding: 0 .25vw;
+}
